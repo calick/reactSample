@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Dialog</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+
+  <style type="text/css">
+    .dialog {
+      border: 1px solid gray;
+      background-color: beige;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+class Dialog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state ={
+      i: 0
+    }
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick(){
+    this.setState({
+      i: this.state.i + 1
+    });
+  }
+
+  render() {
+    let colormap = ["black", "red", "green", "blue"];
+    let bgcolormap = ["blue" , "black", "red", "green"];
+    let i = this.state.i % colormap.length;
+    let color = {
+      color: colormap[i]
+    };
+    let bgcolor = {
+      backgroundColor: bgcolormap[i]
+    }
+
+    return (
+      <div className="dialog" style={bgcolor}>
+        <h1 style={color}>HelloWorld : {i}</h1>
+        <button onClick={this.handleClick}>チェンジ</button>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <Dialog />,
+  document.getElementById('root')
+);
+</script>
+</body>
+</html>

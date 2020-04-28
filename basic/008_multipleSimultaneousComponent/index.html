@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>HeiseiConvert</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+class YearInput extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    this.props.onYearChange(e.target.value);
+  }
+
+  render() {
+    const year = this.props.year;
+    const type = this.props.type;
+
+    return (
+      <fieldset>
+        <legend>{type}:</legend>
+        <input value={year}
+               placeholder={this.props.placeholder}
+               onChange={this.handleChange} /> 
+               年
+      </fieldset>
+    );
+  }
+}
+
+class WarekiConvert extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+          ad: "",
+       showa: "",
+      heisei: "",
+      reiwa: ""
+    };
+
+    this.handleAdChange     = this.handleAdChange.bind(this);
+    this.handleShowaChange  = this.handleShowaChange.bind(this);
+    this.handleHeiseiChange = this.handleHeiseiChange.bind(this);
+    this.handleReiwaChange = this.handleReiwaChange.bind(this);
+}
+
+  handleAdChange(year) {
+    this.setState({
+          ad: year,
+       showa: this.toConvert(year, -1925),
+       heisei: this.toConvert(year, -1989),
+       reiwa: this.toConvert(year, -2019)
+    });
+  }
+
+  handleShowaChange(year) {
+    this.setState({
+          ad: this.toConvert(year, 1925),
+       showa: year,
+       heisei: this.toConvert(year, -63),
+       reiwa: this.toConvert(year, -94)
+    });
+  }
+
+  handleHeiseiChange(year) {
+    this.setState({
+          ad: this.toConvert(year, 1988),
+       showa: this.toConvert(year, 63),
+       heisei: year,
+       reiwa: this.toConvert(year, -31)
+    });
+  }
+
+  handleReiwaChange(year) {
+    this.setState({
+          ad: this.toConvert(year, 2018),
+       showa: this.toConvert(year, 93),
+       heisei: this.toConvert(year, 30),
+       reiwa: year
+    });
+  }
+
+  toConvert(year, value){
+    if( Number.isNaN(parseFloat(year)) ){
+      return('');
+    }
+    return( Number(year) + value);
+  }
+
+  render() {
+    return (
+      <div>
+        <YearInput
+          type="西暦"
+          placeholder="例: 2019"
+          year={this.state.ad}
+          onYearChange={this.handleAdChange} />
+        <YearInput
+          type="昭和"
+          placeholder="例: 64"
+          year={this.state.showa}
+          onYearChange={this.handleShowaChange} />
+        <YearInput
+          type="平成"
+          placeholder="例: 30"
+          year={this.state.heisei}
+          onYearChange={this.handleHeiseiChange} />
+        <YearInput
+          type="令和"
+          placeholder="例: 1"
+          year={this.state.reiwa}
+          onYearChange={this.handleReiwaChange} />
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(
+  <WarekiConvert />,
+  document.getElementById('root')
+);
+</script>
+</body>
+</html>

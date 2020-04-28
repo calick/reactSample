@@ -1,0 +1,7 @@
+{
+    "monsters": [
+      { "id": 1, "name": "aaa", "hp": 10 },
+      { "id": 2, "name": "bbb", "hp": 12 },
+      { "id": 3, "name": "ccc", "hp": 36 }
+    ] 
+}

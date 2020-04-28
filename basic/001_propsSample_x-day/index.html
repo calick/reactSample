@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>RemainTime</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- 型定義を行うためのライブラリを追加 -->
+  <script src="https://unpkg.com/prop-types@15.6/prop-types.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+<body>
+  <dev>基本形</dev>
+  <div id="root"></div>
+
+  <dev>型チェックのサンプル</dev>
+  <div id="root_2"></div>
+  
+  <dev>default値のサンプル</dev>
+  <div id="root_3"></div>
+  
+  <script type="text/babel">
+    class RemainTime extends React.Component {
+      constructor(props) {
+        super(props);
+        this.state = {
+          now: new Date().getTime(),
+          target: new Date(props.date).getTime()
+        };
+      }
+
+      render() {
+        let remain = Math.floor( ( this.state.target - this.state.now ) / (1000 * 60 * 60 * 24) );
+        return <h1>{this.props.message}まで約{remain}日</h1>;
+      }
+    }
+
+    ReactDOM.render(
+        // 属性は複数同時に指定可能
+        <RemainTime date="2112-09-03 00:00:00" message="ｘｘｘ誕生"/>,
+        document.getElementById('root')
+    );
+
+    // --- 型定義 ---
+    class RemainTime_2 extends React.Component {
+      constructor(props){
+        super(props);
+        this.state = {
+          now: new Date().getTime(),
+          target: new Date(props.date).getTime()
+        };
+      }
+      render() {
+        let remain = Math.floor( ( this.state.target - this.state.now ) / (1000 * 60 * 60 * 24) );
+        return <h1>{this.props.message}まで約{remain}日</h1>;
+      }
+    }
+
+    // Propsの型定義
+    RemainTime_2.propTypes = {
+      date: PropTypes.string,
+      message: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number
+      ]).isRequired
+      // // いずれかの値であるかチェックしたい場合
+      // message: PropTypes.oneOf(["aaa","bbb","ccc","ddd"])
+
+    };
+
+
+    ReactDOM.render(
+      <RemainTime_2 date="2112-09-03 00:00:00" message={12345} />,
+      document.getElementById('root_2')
+  );
+
+  // --- デフォルト値の指定 ---
+  class RemainTime_3 extends React.Component {
+    constructor(props){
+      super(props);
+      this.state = {
+        now: new Date().getTime(),
+        target: new Date(props.date).getTime()
+      };
+    }
+    render() {
+      let remain = Math.floor((this.state.target - this.state.now) / (1000 * 60 * 60 * 24) );
+      return <h1>{this.props.message_3}まで約{remain}日</h1>;
+    }
+  }
+
+  /**
+  * propsの型定義
+  */
+  RemainTime_3.propTypes = {
+         date: PropTypes.string,
+         message_3: PropTypes.string
+  };
+
+  /**
+  * propsのデフォルト値
+  */
+  RemainTime_3.defaultProps = {
+    message_3: "default_value"
+  };
+
+  ReactDOM.render(
+      <RemainTime_3 date="2220-09-03 00:00:00" />,
+      document.getElementById('root_3')
+  );
+
+  </script>
+</body>
+</html>

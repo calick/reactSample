@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello World</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+    <!-- Don't use this in production: -->
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root_1"></div>
+    <div id="root_2"></div>
+    <div id="just_now"></div>
+    <div id="state"></div>
+    <div id="lifecycle"></div>
+    <script type="text/babel">
+    //////////// use jsx
+      ReactDOM.render(
+        <h1>Hello World 1</h1>,
+        document.getElementById('root_1')
+      );
+    //////////// don't use jsx
+      ReactDOM.render(
+        React.createElement("h1", null, "Hello World 2"),
+        document.getElementById('root_2')
+      );
+
+    //////////// component sample
+    // make JustnowComponent
+    class Justnow extends React.Component {
+        render() {
+            let now = new Date();
+            let now_date = [now.getFullYear(), now.getMonth()+1, now.getDate()].join('-');
+            let now_time = [now.getHours(), now.getMinutes(), now.getSeconds()].join(':');
+            return <h1>{now_date} {now_time}</h1>;
+        }
+    }
+    // // old version(ver16) React.createClass() 現在は利用できない
+    // var Justnow = React.createClass({
+    // render: function(){
+    //         let now = new Date();
+    //         let now_date = [now.getFullYear(), now.getMonth()+1, now.getDate()].join('-');
+    //         let now_time = [now.getHours(), now.getMinutes(), now.getSeconds()].join(':');
+
+    //         return <h1>{now_date} {now_time}</h1>;
+    //     }
+    // });
+
+    ReactDOM.render(
+      <Justnow />,
+      document.getElementById('just_now')
+    );
+
+    //////////// state sample
+    class State extends React.Component {
+        // stateの初期値をセット
+        constructor(props){
+            // スーパークラスであるReact.Componentの方のコンストラクタを実行するためのもの
+            // これを書いておかないとスーパークラス側のコンストラクタが上書きされ実行されない
+            super(props);
+            // Component内で保持しておきたいデータはここにセットしておく
+            this.state = {
+                now: new Date()
+            };
+        }
+
+        render() {
+            // 初期化時に代入した値を指定し参照する
+            let now = this.state.now;
+            let now_date = [now.getFullYear(), now.getMonth()+1, now.getDate()].join('-');
+            let now_time = [now.getHours(), now.getMinutes(), now.getSeconds()].join(':');
+            return <h1>{now_date} {now_time}</h1>;            
+        }
+    }
+
+    ReactDOM.render(
+      <State />,
+      document.getElementById('state')
+    );
+
+    //////////// Lifecycle sample
+    class Lifecycle extends React.Component {
+        constructor(props){
+            // 一番最初に実行される
+            super(props);
+            this.state = {
+                now: new Date(),
+                message: "現在時刻は、"
+            };
+        }
+
+        // Lifecycle: ComponentがDOMツリーに加わった際の処理
+        componentDidMount(){
+            // ComponentがDOMツリーに追加された直後（render()実行直後）に実行される。
+            // DOMツリーに追加されあ要素などに対して処理を行うことが可能
+            this.timerID = setInterval(
+                () => this.tick(),
+                1000
+            );
+        }
+
+        // Lifecycle: ComponentがDOMツリーから削除される際の処理
+        componentWillUnmount(){
+            // ComponentがDOMツリーに追加される直前に実行される（まだ実行されていない点に注意）
+            clearInterval(this.timerID);
+        }
+
+        tick(){
+            // Stateの値を更新する際には必ずthis.setState()メソッドを通して実行する必要がある
+            // このメソッドを通すことにより自動的にrender()メソッドが実行される
+            // ※コンストラクタでは利用しないこと
+            this.setState({
+                now: new Date()
+            });
+        }
+        render() {
+            // 初期化時に代入した値を指定し参照する
+            // 描画処理
+            let now = this.state.now;
+            let now_date = [now.getFullYear(), now.getMonth()+1, now.getDate()].join('-');
+            let now_time = [now.getHours(), now.getMinutes(), now.getSeconds()].join(':');
+            return <h1>{this.state.message} {now_date} {now_time}</h1>;            
+        }
+    }
+
+    ReactDOM.render(
+      <Lifecycle />,
+      document.getElementById('lifecycle')
+    );
+
+    </script>
+  </body>
+</html>

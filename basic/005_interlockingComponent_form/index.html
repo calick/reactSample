@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>AutoCompletionBox</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+<body>
+    <div>入力候補を自動的に表示してくれるAutoCompleteのSample</div>
+    <div id="root_textbox"></div>
+    <br>
+  
+    <div>選択項目を削除するSample</div>
+    <div id="root_pulldown"></div>
+    <br>
+
+    <div>checkbox Sample</div>
+    <div id="root_checkbox"></div>
+    <br>
+        
+    <div>ラジオボタン Sample</div>
+    <h1>BomButton</h1>
+    <p>線を一つ選んで爆弾を解除してください</p>
+    <div id="root_radioButton"></div>
+        
+  <script type="text/babel">
+    // ----------- textbox -----------------------------------------------------------
+    class AutoCompletionBox extends React.Component {
+      constructor(props) {
+        super(props);
+        this.INITIAL_WORD = '入力してください';
+
+        this.state = {
+          value: '',                 //ユーザーが入力した文字列が入る
+          word: this.INITIAL_WORD    //自動補完用の文字列が入る
+        };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
+      }
+
+      handleChange(e) {
+        let buff = e.target.value;            //入力された文字列
+        let ac   = this.candidateData(buff);  //自動補完された文字列
+
+        this.setState({value: buff, word: ac});
+      }
+      handleSubmit(e) {
+        // 初期文言と自動補完用の文字が異なっていればStateを更新
+        if( this.state.word !== this.INITIAL_WORD ){
+          this.setState({value: this.state.word});
+        }
+        e.preventDefault();  //Submitイベントによる画面遷移をキャンセル
+      }
+
+      /**
+       * 自動補完用の文字列を返却
+       */
+      candidateData(key){
+        let i = key.slice(0,1).toLowerCase();  //先頭の1文字を取り出し小文字に
+        let data = {
+          a: 'Android',
+          b: 'BlackBerryOS',
+          f: 'FireFoxOS',
+          i: 'iOS',
+          t: 'Tizen',
+          u: 'Ubuntu Touch',
+          w: 'Windows 10 Mobile'
+        };
+
+        return( ( i in data )?  data[i]:this.INITIAL_WORD );
+      }
+
+      render() {
+        return (
+          <form onSubmit={this.handleSubmit}>
+            <label>
+              お使いのスマートフォンのOSは？<br />
+              <input type="text" value={this.state.value} onChange={this.handleChange} /><br />
+              <input type="submit" value={this.state.word} />
+            </label>
+          </form>
+        );
+      }
+    }
+
+    ReactDOM.render(
+      <AutoCompletionBox />,
+      document.getElementById('root_textbox')
+    );
+
+    // ----------- pull down -----------------------------------------------------------
+    class MemberList extends React.Component {
+     constructor(props) {
+       super(props);
+       this.state = {
+          guys: this.props.guys,
+          value: this.props.default
+       };
+
+       this.handleRemove = this.handleRemove.bind(this);
+     }
+
+     handleRemove(id){
+       const guys = this.state.guys;
+       const new_guys = [];
+
+         for( let i=0; i<guys.length; i++ ){
+           if(guys[i].id !== id){
+             new_guys.push(guys[i]);
+           }
+       }
+
+       this.setState({guys:new_guys});
+     }
+
+     render(){
+       const guys = this.state.guys;
+       const listItems = guys.map((guy) =>
+         <option key={guy.id.toString()} onClick={ ()=>{ this.handleRemove(guy.id) } }>
+           {guy.name}
+         </option>
+       );
+       const listSize = this.state.guys.length;
+
+       return <select size={listSize}>{listItems}</select>;
+     }
+   }
+
+    const guys = [
+      {id:10, name:"Foo"},
+      {id:20, name:"Bar"},
+      {id:30, name:"Hoge"},
+      {id:40, name:"Fuga"}
+      ];
+
+    ReactDOM.render(
+      <MemberList guys={guys} />,
+      document.getElementById('root_pulldown')
+    );
+
+    // ----------- checkbox -----------------------------------------------------------
+    class AreaCheck extends React.Component {
+    constructor(props) {
+      super(props);
+      this.cd = this.props.cd;
+      this.state = {
+        area: this.props.area
+      };
+
+      this.handleKenChange = this.handleKenChange.bind(this);  //各都道府県のチェック
+      this.handleAllChange = this.handleAllChange.bind(this);  //まとめてチェック
+    }
+
+    /**
+     * 各都道府県をチェック
+     */
+    handleKenChange(e) {
+      let name  = e.target.name;
+      let value = this.state.area.map( (ken)=>{
+        return({
+          cd: ken.cd,
+          name: ken.name,
+          checked: (ken.cd===name)? e.target.checked:ken.checked
+        })
+      });
+
+      this.setState({area: value});
+    }
+
+    /**
+     * まとめてチェック
+     */
+    handleAllChange(e){
+      let value = this.state.area.map( (ken)=>{
+        return({
+          cd: ken.cd,
+          name: ken.name,
+          checked: e.target.checked //ここのチェック状態をmap全てに適用する
+        })
+      });
+
+      this.setState({area: value});
+    }
+
+    render() {
+      let area = this.state.area;
+      let listItems = area.map((ken) =>
+        <label key={ken.cd.toString()}>
+          <input
+            type="checkbox"
+            name={ken.cd}
+            value={ken.cd}
+            checked={ken.checked}
+            onChange={this.handleKenChange} />
+            {ken.name}
+        </label>
+      );
+
+      return (
+        <form>
+          <label key={this.cd}>
+            <input type="checkbox" name="ALL" onChange={this.handleAllChange} />
+            このエリアをチェック
+          </label>
+          <br />
+          {listItems}
+        </form>
+      );
+    }
+  }
+
+  const Chugoku = [
+    {cd:'31', name:'鳥取県', checked:false},
+    {cd:'32', name:'島根県', checked:false},
+    {cd:'33', name:'岡山県', checked:false},
+    {cd:'34', name:'広島県', checked:false},
+    {cd:'35', name:'山口県', checked:false}
+  ];
+  const Shikoku =[
+    {cd:'36', name:'徳島県', checked:false},
+    {cd:'37', name:'香川県', checked:false},
+    {cd:'38', name:'愛媛県', checked:false},
+    {cd:'39', name:'高知県', checked:false}
+  ];
+  ReactDOM.render(
+    <div>
+      <AreaCheck cd="CG" area={Chugoku} />
+      <AreaCheck cd="SK" area={Shikoku} />
+    </div>,
+    document.getElementById('root_checkbox')
+  );
+
+    // ----------- radioButton -----------------------------------------------------------
+    class BomButton extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      radio: [
+        {cd:'red',   name:"赤", checked:false},
+        {cd:'blue',  name:"青", checked:false},
+        {cd:'green', name:"緑", checked:false}
+      ],
+      lastclick: null  //最後に選択された色を入れる
+    };
+
+    // State内の色の中から抽選を行う
+    let i = Math.floor(Math.random() * 100) % this.state.radio.length;
+    this.hit = this.state.radio[i].cd;
+
+    // 爆発時の素材を事前ロードしておく
+    this._preload();
+
+    // イベント用メソッド
+    this.handleRadioClick = this.handleRadioClick.bind(this);
+  }
+
+  /**
+   * 爆発時の素材を事前ロード
+   */
+  _preload(){
+    this.se = new Audio('./bomb1.mp3');
+    this.se.load();
+
+    let img = new Image();
+    img.src = "./bakuhatsu.png";
+  }
+
+  /**
+   * ラジオボタンをクリック
+   */
+  handleRadioClick(e) {
+    const color = e.target.name;
+    if( ! confirm('本当に'+ color +'の線で良いですか？') ){
+      return(false);
+    }
+
+    let name  = e.target.name;
+    let value = this.state.radio.map( (item)=>{
+      return({
+        cd: item.cd,
+        name: item.name,
+        checked: (item.cd===name)? true:false
+      })
+    });
+
+    this.setState({
+        radio: value
+      , lastclick: name
+    });
+  }
+
+  render() {
+    //----------------
+    // 当選したら爆発
+    //----------------
+    if( this.hit === this.state.lastclick ){
+      this.se.play();
+      return <div><img src="./bakuhatsu.png" /></div>
+    }
+    //----------------
+    // 選択肢の表示
+    //----------------
+    else{
+      const radio = this.state.radio;
+      const listItems = radio.map((r) =>
+        <label key={r.cd.toString()} style={{color: r.cd}}>
+          <input
+            type="radio"
+            name={r.cd}
+            value={r.cd}
+            checked={r.checked}
+            onChange={this.handleRadioClick} />
+          {r.name}<br />
+        </label>
+      );
+      return <form>{listItems}</form>
+    }
+  }
+}
+
+ReactDOM.render(
+  <BomButton />,
+  document.getElementById('root_radioButton')
+);
+
+  </script>
+</body>
+</html>

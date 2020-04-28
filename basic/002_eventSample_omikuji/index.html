@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>おみくじ</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+
+  <!-- Don't use this in production: -->
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    class Omikuji extends React.Component {
+      dropOmikuji(name,e){
+        let unsei = ["大吉", "吉", "中吉", "小吉", "凶", "大凶"];
+        let i = Math.ceil(Math.random() * 100) % unsei.length;
+
+        alert(`${name}さんの運勢は${unsei[i]}です`);  // ``内に ${} で変数を埋め込めるのはES2015からの追加仕様
+      }
+
+      overOmikuji(){
+          console.log("マウスオーバー");
+      }
+
+      outOmikuji(){
+          console.log("マウスアウト");
+      }
+
+      render() {
+        return <button
+        onClick={this.dropOmikuji.bind(this,"foo")}
+        onMouseOver={this.overOmikuji}
+        onMouseOut={this.outOmikuji}
+        >
+        おみくじを引く
+        </button>;
+      }
+    }
+
+    ReactDOM.render(
+      <Omikuji />,
+      document.getElementById('root')
+    );
+  </script>
+</body>
+</html>

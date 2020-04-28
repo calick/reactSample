@@ -1,0 +1,22 @@
+a:hover{
+  color: red;
+}
+ul{
+  list-style: none;
+}
+
+.container{
+  display: inline-flex;  /* 横に並べる */
+}
+.gnavi{
+  order: 1;
+  width: 80px;
+  height: 500px;
+  padding: 10px;
+  margin-right: 10px;
+  background-color: skyblue;
+}
+.item{
+  order: 2;
+}
+
